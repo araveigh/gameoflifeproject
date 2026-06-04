@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<!-- saved from url=(0066)file:///C:/Users/AllisonGreig/Downloads/personal-finance-game.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Life &amp; Money — The Financial Simulation</title>
+<link href="./Life &amp; Money — The Financial Simulation_files/css2" rel="stylesheet">
+<style>
+  :root {
+    --cream: #f5edd8;
+    --parchment: #e8d9b5;
+    --dark-parchment: #d4c090;
+    --ink: #2c1a0e;
+    --dark-ink: #1a0d06;
+    --red: #c0392b;
+    --green: #27623a;
+    --gold: #b8860b;
+    --gold-light: #d4a017;
+    --blue: #1a4a7a;
+    --purple: #4a1a6a;
+    --shadow: rgba(44,26,14,0.25);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #1a0d06;
+    background-image: 
+      radial-gradient(ellipse at 20% 20%, #2c1a0e 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 80%, #0d0600 0%, transparent 60%);
+    min-height: 100vh;
+    font-family: 'Libre Baskerville', serif;
+    color: var(--ink);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+  }
+
+  /* ---- HEADER ---- */
+  .game-header {
+    text-align: center;
+    margin-bottom: 24px;
+    animation: fadeDown 0.8s ease both;
+  }
+  .game-header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.2rem, 6vw, 4rem);
+    font-weight: 900;
+    color: var(--gold-light);
+    text-shadow: 0 2px 8px rgba(0,0,0,0.6), 0 0 30px rgba(180,130,20,0.3);
+    letter-spacing: 0.02em;
+    line-height: 1;
+  }
+  .game-header .subtitle {
+    font-family: 'Special Elite', cursive;
+    color: var(--parchment);
+    font-size: 0.95rem;
+    letter-spacing: 0.15em;
+    margin-top: 6px;
+    opacity: 0.8;
+  }
+  .header-rule {
+    width: 200px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    margin: 10px auto 0;
+  }
+
+  /* ---- MAIN LAYOUT ---- */
+  .game-container {
+    width: 100%;
+    max-width: 900px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  /* ---- PAPER PANELS ---- */
+  .panel {
+    background: var(--cream);
+    border-radius: 4px;
+    padding: 20px 24px;
+    box-shadow: 0 4px 20px var(--shadow), inset 0 1px 0 rgba(255,255,255,0.6);
+    border: 1px solid var(--dark-parchment);
+    position: relative;
+    animation: fadeUp 0.6s ease both;
+  }
+  .panel::before {
+    content: '';
+    position: absolute;
+    inset: 3px;
+    border: 1px dashed rgba(44,26,14,0.15);
+    border-radius: 2px;
+    pointer-events: none;
+  }
+
+  .panel-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 14px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--dark-parchment);
+  }
+
+  /* ---- START SCREEN ---- */
+  #start-screen { text-align: center; padding: 40px 24px; }
+  #start-screen h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem;
+    font-style: italic;
+    color: var(--ink);
+    margin-bottom: 12px;
+  }
+  #start-screen p {
+    color: #5a3e28;
+    line-height: 1.7;
+    max-width: 560px;
+    margin: 0 auto 28px;
+    font-size: 0.95rem;
+  }
+
+  /* ---- BUTTONS ---- */
+  .btn {
+    display: inline-block;
+    font-family: 'Special Elite', cursive;
+    font-size: 1rem;
+    letter-spacing: 0.1em;
+    padding: 12px 32px;
+    border-radius: 3px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, #8b4513, #6b2f0a);
+    color: var(--cream);
+    box-shadow: 0 3px 10px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.15);
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.35); background: linear-gradient(135deg, #a0521a, #7a3810); }
+  .btn-primary:active { transform: translateY(0); }
+  .btn-choice {
+    display: block;
+    width: 100%;
+    background: var(--parchment);
+    color: var(--ink);
+    border: 1px solid var(--dark-parchment);
+    text-align: left;
+    padding: 14px 18px;
+    margin-bottom: 10px;
+    font-family: 'Libre Baskerville', serif;
+    font-size: 0.9rem;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.2s;
+    line-height: 1.5;
+    letter-spacing: 0;
+  }
+  .btn-choice:hover { background: #e0cfa0; transform: translateX(4px); border-color: var(--gold); }
+  .btn-choice:last-child { margin-bottom: 0; }
+  .btn-choice .choice-cost {
+    display: block;
+    font-size: 0.78rem;
+    color: #5a3e28;
+    margin-top: 3px;
+    font-style: italic;
+  }
+  .btn-choice.good { border-left: 4px solid var(--green); }
+  .btn-choice.risky { border-left: 4px solid var(--gold); }
+  .btn-choice.bad { border-left: 4px solid var(--red); }
+
+  /* ---- DASHBOARD ---- */
+  .dashboard {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+    margin-bottom: 4px;
+  }
+  .stat-card {
+    background: var(--parchment);
+    border: 1px solid var(--dark-parchment);
+    border-radius: 3px;
+    padding: 12px 14px;
+    text-align: center;
+  }
+  .stat-card .stat-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #7a5a3a;
+    margin-bottom: 4px;
+  }
+  .stat-card .stat-value {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .stat-card .stat-value.positive { color: var(--green); }
+  .stat-card .stat-value.negative { color: var(--red); }
+  .stat-card .stat-sub {
+    font-size: 0.7rem;
+    color: #7a5a3a;
+    margin-top: 2px;
+    font-style: italic;
+  }
+
+  /* ---- PROGRESS BAR ---- */
+  .progress-track {
+    background: var(--parchment);
+    border: 1px solid var(--dark-parchment);
+    border-radius: 20px;
+    height: 12px;
+    overflow: hidden;
+    margin-top: 10px;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--green), #4CAF50);
+    border-radius: 20px;
+    transition: width 0.6s ease;
+  }
+  .progress-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.72rem;
+    color: #7a5a3a;
+    margin-bottom: 4px;
+  }
+
+  /* ---- CARD FLIP ---- */
+  .card-zone {
+    perspective: 1000px;
+    min-height: 180px;
+  }
+  .event-card {
+    background: var(--cream);
+    border: 2px solid var(--dark-parchment);
+    border-radius: 6px;
+    padding: 22px 24px;
+    box-shadow: 3px 5px 15px var(--shadow);
+    animation: cardFlip 0.5s ease both;
+    position: relative;
+    overflow: hidden;
+  }
+  .event-card::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--gold), var(--gold-light), var(--gold));
+  }
+  .event-card .card-type {
+    font-family: 'Special Elite', cursive;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 8px;
+  }
+  .event-card h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem;
+    color: var(--ink);
+    margin-bottom: 10px;
+    line-height: 1.3;
+  }
+  .event-card p {
+    color: #4a3020;
+    font-size: 0.88rem;
+    line-height: 1.65;
+    margin-bottom: 16px;
+  }
+
+  /* ---- LEDGER / LOG ---- */
+  .ledger {
+    max-height: 160px;
+    overflow-y: auto;
+    font-size: 0.82rem;
+    color: #5a3e28;
+  }
+  .ledger-entry {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 5px 0;
+    border-bottom: 1px dotted var(--dark-parchment);
+    animation: fadeIn 0.3s ease;
+    gap: 12px;
+  }
+  .ledger-entry:last-child { border-bottom: none; }
+  .ledger-entry .entry-text { flex: 1; font-style: italic; }
+  .ledger-entry .entry-amount { font-family: 'Playfair Display', serif; font-weight: 700; white-space: nowrap; }
+  .ledger-entry .entry-amount.pos { color: var(--green); }
+  .ledger-entry .entry-amount.neg { color: var(--red); }
+  .ledger::-webkit-scrollbar { width: 5px; }
+  .ledger::-webkit-scrollbar-track { background: var(--parchment); }
+  .ledger::-webkit-scrollbar-thumb { background: var(--dark-parchment); border-radius: 3px; }
+
+  /* ---- JOB CARD ---- */
+  .job-card {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+  .job-icon {
+    font-size: 2.5rem;
+    flex-shrink: 0;
+  }
+  .job-details h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem;
+    font-style: italic;
+    color: var(--ink);
+  }
+  .job-details .job-salary {
+    color: var(--green);
+    font-weight: 700;
+    font-size: 0.95rem;
+    margin: 3px 0;
+  }
+  .job-details p {
+    font-size: 0.82rem;
+    color: #5a3e28;
+    line-height: 1.5;
+    font-style: italic;
+  }
+
+  /* ---- END SCREEN ---- */
+  #end-screen { text-align: center; }
+  .score-ring {
+    width: 120px; height: 120px;
+    border-radius: 50%;
+    border: 6px solid var(--gold);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    margin: 20px auto;
+    box-shadow: 0 0 20px rgba(180,130,20,0.3);
+  }
+  .score-ring .score-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.2rem;
+    font-weight: 900;
+    color: var(--ink);
+    line-height: 1;
+  }
+  .score-ring .score-grade {
+    font-family: 'Special Elite', cursive;
+    font-size: 0.75rem;
+    color: var(--gold);
+    letter-spacing: 0.1em;
+  }
+  .final-summary {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    text-align: left;
+    margin: 16px 0 24px;
+  }
+  .final-summary .fs-item {
+    background: var(--parchment);
+    border: 1px solid var(--dark-parchment);
+    border-radius: 3px;
+    padding: 10px 14px;
+  }
+  .final-summary .fs-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; color: #7a5a3a; }
+  .final-summary .fs-val { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; color: var(--ink); }
+
+  /* ---- HIDDEN ---- */
+  .hidden { display: none !important; }
+
+  /* ---- ANIMATIONS ---- */
+  @keyframes fadeDown { from { opacity:0; transform:translateY(-20px); } to { opacity:1; transform:translateY(0); } }
+  @keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+  @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+  @keyframes cardFlip { from { opacity:0; transform:rotateY(30deg) scale(0.95); } to { opacity:1; transform:rotateY(0) scale(1); } }
+  @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.5;} }
+  .pulsing { animation: pulse 1.5s infinite; }
+
+  /* ---- DECORATIVE DIVIDER ---- */
+  .divider {
+    text-align: center;
+    font-size: 1.2rem;
+    color: var(--gold);
+    letter-spacing: 0.5em;
+    margin: 4px 0 8px;
+    opacity: 0.5;
+  }
+
+  /* ---- NOTIFICATION TOAST ---- */
+  #toast {
+    position: fixed;
+    top: 20px; right: 20px;
+    background: var(--ink);
+    color: var(--cream);
+    font-family: 'Special Elite', cursive;
+    font-size: 0.85rem;
+    padding: 12px 20px;
+    border-radius: 3px;
+    border-left: 4px solid var(--gold);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    transform: translateX(120%);
+    transition: transform 0.3s ease;
+    z-index: 1000;
+    max-width: 280px;
+  }
+  #toast.show { transform: translateX(0); }
+
+  .project-badge {
+    background: rgba(180,130,20,0.15);
+    border: 1px solid rgba(180,130,20,0.4);
+    color: var(--parchment);
+    font-family: 'Special Elite', cursive;
+    font-size: 0.78rem;
+    letter-spacing: 0.05em;
+    padding: 7px 18px;
+    border-radius: 3px;
+    margin-top: 10px;
+    display: inline-block;
+  }
+  .workbook-tip {
+    background: rgba(180,130,20,0.08);
+    border-left: 3px solid var(--gold);
+    color: var(--parchment);
+    font-family: 'Special Elite', cursive;
+    font-size: 0.78rem;
+    padding: 8px 14px;
+    border-radius: 0 3px 3px 0;
+    margin-bottom: 8px;
+  }
+  #print-summary {
+    background: var(--cream);
+    border: 2px dashed var(--dark-parchment);
+    border-radius: 4px;
+    padding: 24px;
+    margin-top: 16px;
+  }
+  #print-summary h3 { font-family: 'Playfair Display', serif; font-size: 1.1rem; margin-bottom: 12px; color: var(--ink); }
+  .print-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+  .print-cell { background: var(--parchment); border: 1px solid var(--dark-parchment); padding: 8px 12px; border-radius: 2px; }
+  .print-cell .pc-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.12em; color: #7a5a3a; }
+  .print-cell .pc-val { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; }
+  .btn-print {
+    background: linear-gradient(135deg, var(--green), #1e5230);
+    color: white;
+    font-family: 'Special Elite', cursive;
+    font-size: 0.9rem;
+    padding: 10px 24px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    letter-spacing: 0.08em;
+    margin-right: 10px;
+  }
+  .btn-print:hover { filter: brightness(1.1); }
+  @media print {
+    body { background: white !important; padding: 0; }
+    .game-header, #game-screen, .btn-primary, .btn-print { display: none !important; }
+    #end-screen { display: block !important; box-shadow: none; border: none; }
+    #print-summary { border: 1px solid #ccc; }
+    #toast { display: none !important; }
+  }
+  @media (max-width: 600px) {
+    .dashboard { grid-template-columns: repeat(2, 1fr); }
+    .final-summary { grid-template-columns: 1fr; }
+    body { padding: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<div id="toast"></div>
+
+<div class="game-header">
+  <h1>Life &amp; Money</h1>
+  <div class="subtitle">✦ The Financial Simulation ✦</div>
+  <div class="project-badge">📋 Final Project — Personal Finance 20S &nbsp;|&nbsp; Fill in your <strong>Student Workbook</strong> as you play</div>
+  <div class="header-rule"></div>
+</div>
+
+<div class="game-container">
+
+  <!-- START SCREEN -->
+  <div class="panel" id="start-screen">
+    <h2>Begin Your Financial Journey</h2>
+    <p>You'll be dealt a career card and face real-life financial decisions over 12 rounds. Every choice affects your savings, debt, and happiness score. Can you retire comfortably — or will you end up broke?</p>
+    <button class="btn btn-primary" onclick="startGame()">✦ Deal My Cards ✦</button>
+  </div>
+
+  <!-- GAME SCREEN -->
+  <div id="game-screen" class="hidden">
+
+    <!-- Dashboard -->
+    <div class="panel" style="animation-delay:0.1s">
+      <div class="panel-title">📊 Your Finances</div>
+      <div class="dashboard">
+        <div class="stat-card">
+          <div class="stat-label">Savings</div>
+          <div class="stat-value positive" id="stat-savings">$0</div>
+          <div class="stat-sub">in the bank</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Debt</div>
+          <div class="stat-value negative" id="stat-debt">$0</div>
+          <div class="stat-sub">outstanding</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Monthly Pay</div>
+          <div class="stat-value" id="stat-salary">$0</div>
+          <div class="stat-sub">after tax</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Happiness</div>
+          <div class="stat-value" id="stat-happiness">100</div>
+          <div class="stat-sub">out of 100</div>
+        </div>
+      </div>
+      <div class="progress-label">
+        <span>Round <span id="round-current">1</span> of 12</span>
+        <span id="round-label">Early Career</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="progress-fill" style="width:8%"></div>
+      </div>
+    </div>
+
+    <!-- Job Card -->
+    <div class="panel" id="job-panel" style="animation-delay:0.2s">
+      <div class="panel-title">💼 Your Career</div>
+      <div class="job-card">
+        <div class="job-icon" id="job-icon">👤</div>
+        <div class="job-details">
+          <h3 id="job-title">—</h3>
+          <div class="job-salary" id="job-salary">$0 / month</div>
+          <p id="job-description">—</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Event Card -->
+    <div class="panel card-zone" style="animation-delay:0.3s">
+      <div class="panel-title">🎲 Life Event</div>
+      <div id="event-area">
+        <p style="color:#7a5a3a; font-style:italic; text-align:center; padding:20px 0;">Drawing your first card…</p>
+      </div>
+    </div>
+
+    <!-- Transaction Ledger -->
+    <div class="panel" style="animation-delay:0.4s">
+      <div class="panel-title">📒 Financial Ledger</div>
+      <div class="ledger" id="ledger">
+        <div style="color:#7a5a3a; font-style:italic; font-size:0.85rem;">Your transaction history will appear here.</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- END SCREEN -->
+  <div class="panel hidden" id="end-screen">
+    <div class="panel-title">🏁 Game Over — Final Report</div>
+    <div class="score-ring">
+      <div class="score-num" id="final-score">0</div>
+      <div class="score-grade" id="final-grade">—</div>
+    </div>
+    <div class="final-summary">
+      <div class="fs-item"><div class="fs-label">Final Savings</div><div class="fs-val" id="fs-savings">—</div></div>
+      <div class="fs-item"><div class="fs-label">Final Debt</div><div class="fs-val" id="fs-debt">—</div></div>
+      <div class="fs-item"><div class="fs-label">Happiness Score</div><div class="fs-val" id="fs-happiness">—</div></div>
+      <div class="fs-item"><div class="fs-label">Career</div><div class="fs-val" id="fs-career">—</div></div>
+    </div>
+    <p id="end-message" style="color:#4a3020; font-style:italic; margin-bottom:16px; line-height:1.7;"></p>
+
+    <div id="print-summary">
+      <h3>📋 Copy These Numbers Into Your Workbook — Section 3</h3>
+      <div class="print-grid">
+        <div class="print-cell"><div class="pc-label">Final Savings</div><div class="pc-val" id="ps-savings">—</div></div>
+        <div class="print-cell"><div class="pc-label">Final Debt</div><div class="pc-val" id="ps-debt">—</div></div>
+        <div class="print-cell"><div class="pc-label">Net Worth (Savings − Debt)</div><div class="pc-val" id="ps-networth">—</div></div>
+        <div class="print-cell"><div class="pc-label">Happiness Score</div><div class="pc-val" id="ps-happiness">—</div></div>
+        <div class="print-cell"><div class="pc-label">Final Grade</div><div class="pc-val" id="ps-grade">—</div></div>
+        <div class="print-cell"><div class="pc-label">Final Monthly Income</div><div class="pc-val" id="ps-salary">—</div></div>
+        <div class="print-cell"><div class="pc-label">Career</div><div class="pc-val" id="ps-career">—</div></div>
+        <div class="print-cell"><div class="pc-label">Starting Debt (from Day 1)</div><div class="pc-val" id="ps-startdebt">—</div></div>
+      </div>
+      <p style="font-size:0.82rem; color:#5a3e28; font-style:italic; margin-bottom:12px;">Once you have recorded your numbers, complete your Reflection Report in Section 4.</p>
+      <button class="btn-print" onclick="window.print()">🖨️ Print This Summary</button>
+      <button class="btn btn-primary" onclick="resetGame()" style="font-size:0.9rem; padding:10px 20px;">↩ Play Again</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ===================== DATA =====================
+
+const JOBS = [
+  { icon:'👩‍🏫', title:'School Teacher', salary:3400, description:'Steady pay, great summers off, pension plan included. Student loans from university still linger.', debt:28000, savings:800 },
+  { icon:'👨‍💻', title:'Software Developer', salary:5800, description:'High salary but long hours and expensive city rent. Stock options may pay off.', debt:12000, savings:2000 },
+  { icon:'🚒', title:'Firefighter', salary:4200, description:'Unionized, stable government job with excellent benefits. Shift work affects personal life.', debt:8000, savings:1500 },
+  { icon:'🍕', title:'Restaurant Manager', salary:2800, description:'Irregular hours, tips supplement income. High-stress environment but quick career growth.', debt:5000, savings:500 },
+  { icon:'🏥', title:'Registered Nurse', salary:4600, description:'In-demand career with overtime opportunities. Demanding work takes a toll on wellbeing.', debt:35000, savings:1200 },
+  { icon:'🔧', title:'Electrician (Journeyman)', salary:4900, description:'Trades are booming. Steady contracts and the option to go self-employed someday.', debt:4000, savings:3000 },
+  { icon:'📊', title:'Accountant', salary:4100, description:'Tax season is brutal, but the job security is excellent. Methodical and detail-oriented work.', debt:22000, savings:1800 },
+  { icon:'🎨', title:'Graphic Designer', salary:2600, description:'Creative freelance life means variable income. Passion-driven career with lifestyle flexibility.', debt:15000, savings:400 },
+  { icon:'🚗', title:'Delivery Driver (Gig)', salary:2200, description:'Flexible hours, no benefits, no stability. Vehicle expenses eat into earnings.', debt:6000, savings:200 },
+  { icon:'👩‍⚕️', title:'Pharmacist', salary:6200, description:'Long education path paid off. High income, regulated profession, low unemployment risk.', debt:80000, savings:2500 },
+];
+
+const EVENTS = [
+  // Housing
+  { type:'HOUSING', icon:'🏠', title:'Rent or Buy?', text:'Your lease is up. A studio apartment rents for $1,100/month. A small condo is available — $20,000 down payment, $1,400/month mortgage.', choices:[
+    { label:'Rent the apartment', cost:'$1,100/month ongoing', effect:(g)=>{ g.expenses+=1100; addLog('Renting apartment',-1100,true); toast('Flexibility is nice — but rent never builds equity.'); } },
+    { label:'Buy the condo (if you can afford the down payment)', cost:'$20,000 down + $1,400/month', effect:(g)=>{ if(g.savings>=20000){g.savings-=20000;g.expenses+=1400;g.assets+=20000;addLog('Condo down payment',-20000);addLog('Mortgage payment',-1400,true);toast('Property ownership! Equity builds over time. 🏡');}else{g.expenses+=1100;addLog('Wanted to buy, renting instead',-1100,true);toast('Not enough savings for a down payment yet.',true);} } },
+    { label:'Live with family temporarily', cost:'No rent, save aggressively', effect:(g)=>{ g.happiness-=10; addLog('Living with family',0); toast('Free rent but happiness takes a hit 😅'); }, cls:'risky' },
+  ]},
+  // Car
+  { type:'TRANSPORTATION', icon:'🚗', title:'You Need a Car', text:'Your city has limited transit. You need reliable transportation. A new car costs $28,000 (financed). A used car is $9,000 cash or financed.', choices:[
+    { label:'Buy new car — finance it', cost:'$28,000 loan, ~$480/month', effect:(g)=>{ g.debt+=28000;g.expenses+=480;g.assets+=15000;addLog('New car loan (debt)',-28000);addLog('Car payment',-480,true);toast('New car smell! But that debt is real money.'); } },
+    { label:'Buy used car — pay cash if able', cost:'$9,000', effect:(g)=>{ if(g.savings>=9000){g.savings-=9000;g.assets+=7000;addLog('Used car purchased',-9000);toast('Smart move — no monthly payment! 🙌');}else{g.debt+=9000;g.expenses+=200;addLog('Used car financed',-200,true);toast('Financed a used car. Not ideal but manageable.'); } } },
+    { label:'Use public transit & bike', cost:'$120/month pass', effect:(g)=>{ g.expenses+=120;g.happiness+=5;addLog('Transit pass',-120,true);toast('Budget-friendly and eco-friendly! 🚲'); }, cls:'good' },
+  ]},
+  // Emergency
+  { type:'EMERGENCY', icon:'⚠️', title:'Unexpected Medical Bill', text:'You\'ve been injured and need treatment. Your insurance covers 80% but the remaining 20% is yours. Total bill: $4,200. Your share: $840.', choices:[
+    { label:'Pay from savings', cost:'$840 now', effect:(g)=>{ g.savings-=840;addLog('Medical bill paid',-840);toast('Ouch. Good thing you had savings.'); }, cls:'good' },
+    { label:'Put it on a credit card (19% interest)', cost:'$840 + interest over time', effect:(g)=>{ g.debt+=840;g.expenses+=40;addLog('Medical debt on credit card',-840);toast('Credit card debt: convenient but costly.',true); }, cls:'bad' },
+    { label:'Apply for a payment plan', cost:'$70/month x 12 months', effect:(g)=>{ g.expenses+=70;addLog('Medical payment plan',-70,true);toast('Payment plans spread the pain. Not the worst option.'); } },
+  ]},
+  // Investment
+  { type:'INVESTMENT', icon:'📈', title:'Investment Opportunity', text:'Your bank is offering a TFSA (Tax-Free Savings Account). If you deposit $200/month, your money grows tax-free. Alternatively, you could invest in a friend\'s startup.', choices:[
+    { label:'Open a TFSA — contribute $200/month', cost:'$200/month into savings (you keep it)', effect:(g)=>{ g.savings+=200*3;addLog('TFSA contribution',200*3);toast('Compound interest will thank you later. 📈'); }, cls:'good' },
+    { label:'Invest $5,000 in friend\'s startup', cost:'$5,000 — could double or vanish', effect:(g)=>{ if(g.savings>=5000){const win=Math.random()>0.5;g.savings-=5000;if(win){g.savings+=12000;addLog('Startup pays off!',12000);toast('The startup succeeded! 💰 +$12,000');}else{addLog('Startup failed',-5000);toast('The startup folded. You lost your $5,000.',true);} }else{toast('Not enough savings to invest.',true);} }, cls:'risky' },
+    { label:'Skip investing for now', cost:'Nothing now — opportunity cost later', effect:(g)=>{ g.happiness-=5;addLog('Skipped investing',0);toast('Time is your most valuable asset. Don\'t wait too long.',true); } },
+  ]},
+  // Lifestyle
+  { type:'LIFESTYLE', icon:'✈️', title:'Dream Vacation', text:'You\'ve been working hard and a vacation deal has appeared — $3,200 for two weeks in Europe. You\'ve earned a break, but your savings could use a boost instead.', choices:[
+    { label:'Book the vacation!', cost:'$3,200', effect:(g)=>{ g.savings-=3200;g.happiness+=20;addLog('Dream vacation',-3200);toast('Life is short! You feel recharged! ✈️ +20 happiness'); }, cls:'risky' },
+    { label:'Take a budget staycation instead', cost:'$400', effect:(g)=>{ g.savings-=400;g.happiness+=8;addLog('Staycation',-400);toast('Rest and reset — on a budget. 🏡'); }, cls:'good' },
+    { label:'Skip it — focus on debt repayment', cost:'Nothing spent', effect:(g)=>{ if(g.debt>0){const pay=Math.min(g.debt,3200);g.debt-=pay;addLog('Extra debt payment',pay);toast('Responsible choice. Your future self approves.');}else{g.savings+=500;addLog('Saved instead',500);toast('No debt? Put that money to work!');} } },
+  ]},
+  // Job
+  { type:'CAREER', icon:'💼', title:'Job Offer', text:'A competitor is offering you a 15% raise to switch companies. But you\'d lose your 3 years of pension contributions, and the new role is less stable.', choices:[
+    { label:'Take the new job — higher pay', cost:'Lose pension, gain salary', effect:(g)=>{ const raise=Math.round(g.salary*0.15);g.salary+=raise;g.debt+=5000;addLog('Job change bonus',raise);toast(`+$${raise}/month but pension reset. Worth it?`); }, cls:'risky' },
+    { label:'Stay — negotiate a raise instead', cost:'Time and courage', effect:(g)=>{ const raise=Math.round(g.salary*0.05);g.salary+=raise;addLog('Negotiated raise',raise);toast(`You negotiated! +$${raise}/month. 🎉`); }, cls:'good' },
+    { label:'Stay as-is — job security matters', cost:'Nothing changes', effect:(g)=>{ addLog('Stayed at current job',0);toast('Stability has real value.'); } },
+  ]},
+  // Food
+  { type:'DAILY LIVING', icon:'🛒', title:'Monthly Grocery Budget', text:'You\'re reviewing your food spending. You currently spend $800/month eating out and buying convenience foods. A meal plan could reduce this significantly.', choices:[
+    { label:'Meal prep — reduce to $350/month', cost:'Time investment', effect:(g)=>{ g.expenses-=450;g.happiness-=3;addLog('Meal prepping savings',450);toast('Smart but time-consuming. You save $450/month! 🥗'); }, cls:'good' },
+    { label:'Cook sometimes — reduce to $550/month', cost:'Balanced approach', effect:(g)=>{ g.expenses-=250;addLog('Moderate food savings',250);toast('Balance! You save $250/month without sacrificing joy.'); } },
+    { label:'Keep ordering in — life is short', cost:'$800/month ongoing', effect:(g)=>{ g.happiness+=5;addLog('Food spending unchanged',0);toast('Tasty but expensive. This adds up over a year.',true); } },
+  ]},
+  // Insurance
+  { type:'INSURANCE', icon:'🛡️', title:'Insurance Decisions', text:'You\'re reviewing your insurance. Do you upgrade to full coverage, keep basic coverage, or skip optional coverage to save money?', choices:[
+    { label:'Full coverage — home, life, disability', cost:'$280/month extra protection', effect:(g)=>{ g.expenses+=280;g.happiness+=8;addLog('Full insurance coverage',-280,true);toast('Peace of mind. You\'re protected from big surprises. 🛡️'); }, cls:'good' },
+    { label:'Basic coverage only', cost:'$100/month', effect:(g)=>{ g.expenses+=100;addLog('Basic insurance',-100,true);toast('Acceptable coverage. Crossing fingers on the rest.'); } },
+    { label:'Skip it — save the money', cost:'$0 — risky', effect:(g)=>{ const bad=Math.random()>0.6;if(bad){g.savings-=8000;addLog('Uninsured event cost',-8000);toast('Bad luck! An event cost you $8,000 with no insurance.',true);}else{addLog('Skipped insurance',0);toast('Dodged a bullet this time. Lucky!'); } }, cls:'bad' },
+  ]},
+  // Windfall
+  { type:'WINDFALL', icon:'🎉', title:'Tax Refund — Found Money!', text:'You did your taxes and received a $2,400 refund! What will you do with this unexpected money?', choices:[
+    { label:'Pay down debt aggressively', cost:'All $2,400 to debt', effect:(g)=>{ const pay=Math.min(g.debt,2400);g.debt-=pay;addLog('Tax refund → debt payoff',pay);toast(`You reduced your debt by $${pay}! 💪`); }, cls:'good' },
+    { label:'Put it all in savings/investments', cost:'$2,400 to savings', effect:(g)=>{ g.savings+=2400;addLog('Tax refund → savings',2400);toast('Savings grow! Your future self thanks you.'); }, cls:'good' },
+    { label:'Treat yourself — you deserve it', cost:'$2,400 lifestyle upgrade', effect:(g)=>{ g.happiness+=18;addLog('Splurged tax refund',-2400);toast('You spent it all. Happy now, regretful later? 😬'); }, cls:'risky' },
+  ]},
+  // Education
+  { type:'EDUCATION', icon:'📚', title:'Professional Development', text:'A certification course could increase your salary by 12% but costs $4,500 and takes 6 months of evenings to complete.', choices:[
+    { label:'Invest in the certification', cost:'$4,500 + time', effect:(g)=>{ if(g.savings>=4500){g.savings-=4500;const raise=Math.round(g.salary*0.12);g.salary+=raise;g.happiness-=5;addLog('Certification paid off',raise);toast(`Certification complete! +$${raise}/month for life. 🎓`);}else{g.debt+=4500;const raise=Math.round(g.salary*0.12);g.salary+=raise;addLog('Certification (financed)',raise);toast(`Borrowed to learn. Raise of +$${raise}/month.`);} }, cls:'good' },
+    { label:'Look for free online training instead', cost:'Time only', effect:(g)=>{ const raise=Math.round(g.salary*0.03);g.salary+=raise;addLog('Free training, small raise',raise);toast(`You upskilled! Small raise of +$${raise}/month.`); } },
+    { label:'Skip it — too busy right now', cost:'No upfront cost', effect:(g)=>{ addLog('Skipped development',0);toast('Opportunity cost: skills you didn\'t build.',true); } },
+  ]},
+  // Credit
+  { type:'CREDIT', icon:'💳', title:'Credit Card Limit Increase', text:'Your bank is offering to raise your credit limit from $5,000 to $15,000. This could help in emergencies — or tempt overspending.', choices:[
+    { label:'Accept the increase (discipline required)', cost:'Higher limit available', effect:(g)=>{ g.creditLimit=15000;addLog('Credit limit increased',0);toast('Limit raised. Use it wisely — credit is not income.',true); }, cls:'risky' },
+    { label:'Decline — avoid temptation', cost:'Keep current limit', effect:(g)=>{ g.happiness+=3;addLog('Declined credit increase',0);toast('Self-awareness is a financial superpower.'); }, cls:'good' },
+    { label:'Accept and use it for a big purchase', cost:'New debt incoming', effect:(g)=>{ g.debt+=6000;g.expenses+=200;g.happiness+=10;addLog('New credit card purchase',-6000);toast('Fun stuff but $6,000 more in debt. 19% interest.',true); }, cls:'bad' },
+  ]},
+  // Retirement
+  { type:'RETIREMENT', icon:'👴', title:'RRSP Contribution Season', text:'It\'s RRSP season! Contributing reduces your taxable income. You can contribute up to $8,000 this year. Do you put money in?', choices:[
+    { label:'Max out RRSP — $8,000', cost:'$8,000 from savings, big tax benefit', effect:(g)=>{ if(g.savings>=8000){g.savings-=8000;g.savings+=2400;addLog('RRSP maxed (tax refund incoming)',2400);toast('RRSP maxed! You\'ll get a ~$2,400 tax refund next year. 🏆'); }else{g.savings+=500;addLog('RRSP partial, tax benefit',500);toast('Partial RRSP still saves taxes!');} }, cls:'good' },
+    { label:'Contribute $2,000 — partial', cost:'$2,000 into retirement', effect:(g)=>{ if(g.savings>=2000){g.savings-=2000;g.savings+=600;addLog('RRSP $2,000 contribution',600);toast('Every bit helps. Retirement is a long game.');}else{addLog('Skipped RRSP — no funds',0);toast('No room to contribute right now.',true);} } },
+    { label:'Skip it this year', cost:'Nothing now — lost room later', effect:(g)=>{ addLog('Skipped RRSP',0);toast('You\'ll have more room next year. Don\'t make it a habit.',true); } },
+  ]},
+];
+
+// ===================== STATE =====================
+let G = {};
+let ledgerEntries = [];
+let round = 0;
+let usedEvents = [];
+let shuffledEvents = [];
+
+function startGame() {
+  const job = JOBS[Math.floor(Math.random()*JOBS.length)];
+  G = {
+    salary: job.salary,
+    savings: job.savings,
+    debt: job.debt,
+    expenses: 0,
+    assets: 0,
+    happiness: 85,
+    creditLimit: 5000,
+    job: job,
+  };
+  round = 0;
+  ledgerEntries = [];
+  usedEvents = [];
+  shuffledEvents = [...EVENTS].sort(()=>Math.random()-0.5);
+
+  document.getElementById('start-screen').classList.add('hidden');
+  document.getElementById('end-screen').classList.add('hidden');
+  document.getElementById('game-screen').classList.remove('hidden');
+
+  // Set job display
+  document.getElementById('job-icon').textContent = job.icon;
+  document.getElementById('job-title').textContent = job.title;
+  document.getElementById('job-salary').textContent = `$${job.salary.toLocaleString()} / month after tax`;
+  document.getElementById('job-description').textContent = job.description;
+
+  // Ledger seed
+  addLog(`${job.title} — Starting salary`, job.salary, true);
+  if(job.debt>0) addLog('Student/starting debt', -job.debt);
+  if(job.savings>0) addLog('Starting savings', job.savings);
+
+  updateUI();
+  nextEvent();
+}
+
+function nextEvent() {
+  round++;
+  if(round > 12) { endGame(); return; }
+  if(G.happiness<=0){ G.happiness=0; endGame(); return; }
+
+  G.savings += G.salary;
+  G.savings -= G.expenses;
+  G.savings = Math.max(G.savings, 0);
+  if(G.debt>0){ const interest=Math.round(G.debt*0.005); G.debt+=interest; }
+  G.happiness = Math.min(100, Math.max(0, G.happiness));
+
+  const pct = Math.round((round/12)*100);
+  document.getElementById('round-current').textContent = round;
+  document.getElementById('progress-fill').style.width = pct+'%';
+  const labels=['','Early Career','Early Career','Finding Your Feet','Finding Your Feet','Mid Career','Mid Career','Mid Career','Building Wealth','Building Wealth','Peak Earning','Peak Earning','Approaching Retirement'];
+  document.getElementById('round-label').textContent = labels[round]||'';
+
+  updateUI();
+
+  const ev = shuffledEvents[(round-1) % shuffledEvents.length];
+  renderEvent(ev);
+}
+
+function renderEvent(ev) {
+  const area = document.getElementById('event-area');
+  let choicesHTML = ev.choices.map((c,i) => {
+    const cls = c.cls||'';
+    return `<button class="btn-choice ${cls}" onclick="makeChoice(${EVENTS.indexOf(ev)}, ${i})">
+      <strong>${c.label}</strong>
+      <span class="choice-cost">${c.cost}</span>
+    </button>`;
+  }).join('');
+
+  area.innerHTML = `<div class="workbook-tip">📋 <strong>Round ${round} of 12</strong> — Record this in your <strong>Decision Log, Section 2</strong> of your Student Workbook</div><div class="event-card">
+    <div class="card-type">${ev.icon} ${ev.type}</div>
+    <h3>${ev.title}</h3>
+    <p>${ev.text}</p>
+    ${choicesHTML}
+  </div>`;
+}
+
+function makeChoice(evIdx, choiceIdx) {
+  const ev = EVENTS[evIdx];
+  const choice = ev.choices[choiceIdx];
+  choice.effect(G);
+  G.happiness = Math.min(100, Math.max(0, G.happiness));
+  updateUI();
+  setTimeout(nextEvent, 300);
+}
+
+function addLog(text, amount, isMonthly=false) {
+  ledgerEntries.unshift({ text, amount, monthly: isMonthly });
+  if(ledgerEntries.length > 40) ledgerEntries.pop();
+  renderLedger();
+}
+
+function renderLedger() {
+  const el = document.getElementById('ledger');
+  if(!el) return;
+  el.innerHTML = ledgerEntries.map(e => {
+    const pos = e.amount >= 0;
+    const sign = pos ? '+' : '';
+    const cls = pos ? 'pos' : 'neg';
+    const monthly = e.monthly ? ' <em style="font-size:0.7em;opacity:0.6;">(monthly)</em>' : '';
+    return `<div class="ledger-entry">
+      <span class="entry-text">${e.text}${monthly}</span>
+      <span class="entry-amount ${cls}">${sign}$${Math.abs(e.amount).toLocaleString()}</span>
+    </div>`;
+  }).join('');
+}
+
+function updateUI() {
+  document.getElementById('stat-savings').textContent = '$'+Math.max(0,G.savings).toLocaleString();
+  document.getElementById('stat-savings').className = 'stat-value ' + (G.savings>0?'positive':'negative');
+  document.getElementById('stat-debt').textContent = '$'+Math.max(0,G.debt).toLocaleString();
+  document.getElementById('stat-salary').textContent = '$'+G.salary.toLocaleString();
+  const h = Math.max(0,Math.min(100,Math.round(G.happiness)));
+  document.getElementById('stat-happiness').textContent = h;
+  const hEl = document.getElementById('stat-happiness');
+  hEl.className = 'stat-value' + (h>60?' positive':h>30?'':' negative');
+}
+
+function endGame() {
+  document.getElementById('game-screen').classList.add('hidden');
+  const end = document.getElementById('end-screen');
+  end.classList.remove('hidden');
+
+  const netWorth = G.savings + G.assets - G.debt;
+  let score = Math.min(100, Math.max(0, Math.round(
+    (G.happiness * 0.35) +
+    (Math.min(100, (netWorth / 150000) * 100) * 0.45) +
+    (Math.max(0, 100 - (G.debt/1000)) * 0.2)
+  )));
+
+  let grade, msg;
+  if(score>=85){ grade='A+'; msg='Outstanding! You navigated every financial decision like a pro. You retire comfortably with savings, minimal debt, and genuine happiness. A model of financial literacy.'; }
+  else if(score>=70){ grade='B'; msg='Good work! You made mostly solid choices and built a stable financial life. A few decisions cost you, but you\'re heading into retirement in decent shape.'; }
+  else if(score>=55){ grade='C'; msg='You got through it — but barely. Some expensive choices and unmanaged debt held you back. There\'s real room to grow your financial skills.'; }
+  else if(score>=35){ grade='D'; msg='Tough ride. High debt and low savings make retirement stressful. The good news: you now know exactly what to do differently.'; }
+  else{ grade='F'; msg='Financial crisis. Overwhelming debt, depleted savings, and low happiness caught up with you. Every financial journey has setbacks — what matters is what you learn from them.'; }
+
+  document.getElementById('final-score').textContent = score;
+  document.getElementById('final-grade').textContent = grade;
+  document.getElementById('fs-savings').textContent = '$'+Math.max(0,G.savings).toLocaleString();
+  document.getElementById('fs-debt').textContent = '$'+Math.max(0,G.debt).toLocaleString();
+  document.getElementById('fs-happiness').textContent = Math.round(G.happiness)+'/100';
+  document.getElementById('fs-career').textContent = G.job.title;
+
+  // Print summary panel
+  const netWorth2 = G.savings + G.assets - G.debt;
+  document.getElementById('ps-savings').textContent = '$'+Math.max(0,G.savings).toLocaleString();
+  document.getElementById('ps-debt').textContent = '$'+Math.max(0,G.debt).toLocaleString();
+  document.getElementById('ps-networth').textContent = '$'+netWorth2.toLocaleString();
+  document.getElementById('ps-happiness').textContent = Math.round(G.happiness)+'/100';
+  document.getElementById('ps-grade').textContent = grade+' ('+score+'/100)';
+  document.getElementById('ps-salary').textContent = '$'+G.salary.toLocaleString();
+  document.getElementById('ps-career').textContent = G.job.title;
+  document.getElementById('ps-startdebt').textContent = '$'+G.job.debt.toLocaleString();
+  document.getElementById('end-message').textContent = msg;
+}
+
+function resetGame() {
+  document.getElementById('end-screen').classList.add('hidden');
+  document.getElementById('start-screen').classList.remove('hidden');
+  document.getElementById('ledger').innerHTML = '<div style="color:#7a5a3a; font-style:italic; font-size:0.85rem;">Your transaction history will appear here.</div>';
+}
+
+let toastTimer;
+function toast(msg, warn=false) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.style.borderLeftColor = warn ? '#c0392b' : '#b8860b';
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>el.classList.remove('show'), 3200);
+}
+</script>
+
+
+</body></html>
